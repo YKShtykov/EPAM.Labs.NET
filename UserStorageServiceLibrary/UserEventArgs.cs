@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace UserStorageServiceLibrary
 {
+    [Serializable]
     public class UserEventArgs: EventArgs
     {
         public readonly string operation;

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace UserStorageServiceLibrary
 {
+    [Serializable]
     public class UserNotFoundEventArgs: EventArgs
     {
         public readonly Func<User, bool> predicate;

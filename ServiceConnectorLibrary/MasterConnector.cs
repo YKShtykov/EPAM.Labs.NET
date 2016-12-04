@@ -88,14 +88,21 @@ namespace ServiceConnectorLibrary
             IPAddress ipAddr = ipHost.AddressList[0];
             IPEndPoint ipEndPoint = new IPEndPoint(ipAddr, port);
             Socket sct = new Socket(ipAddr.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            try
+            bool connected = false;
+            while (!connected)
             {
-                sct.Connect(ipEndPoint);
+                try
+                {
+                    sct.Connect(ipEndPoint);
+                    connected = false;
+                }
+                catch (Exception)
+                {
+                    continue;
+                    //throw new Exception("connection failed");
+                }
             }
-            catch (Exception)
-            {
-                throw new Exception("connection failed");
-            }
+            
             sct.Send(msg);
             Console.WriteLine(">> " + port);
         }

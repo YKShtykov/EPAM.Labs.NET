@@ -47,7 +47,7 @@ namespace CreatorLibrary
                 slaves.Add((SlaveConnector)CreateNode(typeof(ServiceConnectorLibrary.SlaveConnector)));
                 currentPort++;
             }
-            ConnectNodes();
+            //ConnectNodes();
 
 
             foreach (var master in masters)
@@ -72,7 +72,7 @@ namespace CreatorLibrary
             }
             //SaveNodesState();
             //slaves[0].Find(new object());
-            masters[0].SetState(new object());
+            //masters[0].SetState(new object());
             //foreach (var item in slaves)
             //{
             //    ThreadPool.QueueUserWorkItem(item.ListenConnection);

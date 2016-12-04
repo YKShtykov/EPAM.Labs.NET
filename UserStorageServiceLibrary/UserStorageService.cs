@@ -9,6 +9,7 @@ using System.Xml.Serialization;
 
 namespace UserStorageServiceLibrary
 {
+    [Serializable]
     public class UserStorageService: IDisposable
     {
         readonly IStorage storage;
@@ -31,7 +32,9 @@ namespace UserStorageServiceLibrary
             if (!ReferenceEquals(AdditionalUserValidation, null))
                 if (!AdditionalUserValidation(user)) throw new UserNotValidException();
 
-            return storage.Add(user);
+            int id = storage.Add(user);
+            OnStateChanged("Add", user);
+            return id;
 
         }
 
