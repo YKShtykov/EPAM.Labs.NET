@@ -2,28 +2,54 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.Sockets;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using ServiceConnectorLibrary;
 using System.Threading;
-using UserStorageServiceLibrary;
-using System.Configuration;
 
 namespace CreatorLibrary
 {
+
+    /// <summary>
+    /// Class-deployer for Master-Slave application.
+    /// It sreates several master and slave nodes and connects them.
+    /// </summary>
     public class UserStorageAppDeployer
     {
+        /// <summary>
+        /// masters count
+        /// </summary>
         private int mCount;
+        /// <summary>
+        /// Slaves count
+        /// </summary>
         private int sCount;
+        /// <summary>
+        /// portNumber for connecting Node to it
+        /// </summary>
         private int currentPort;
+        /// <summary>
+        /// first port the iteration begins from
+        /// </summary>
         private int firstPort;
-        public List<MasterConnector> masters;
-        public List<SlaveConnector> slaves;
+        /// <summary>
+        /// List of master nodes
+        /// </summary>
+        public List<MasterNode> masters;
+        /// <summary>
+        /// List of slaves
+        /// </summary>
+        public List<SlaveNode> slaves;
+        /// <summary>
+        /// List of theads. Each node listens its port in individual thread
+        /// </summary>
         private List<Thread> threads;
 
+        /// <summary>
+        /// Sets parameters for future work
+        /// </summary>
+        /// <param name="mCount">count of masters</param>
+        /// <param name="sCount">count of slaves</param>
+        /// <param name="firstPort"></param>
         public UserStorageAppDeployer(int mCount, int sCount, int firstPort)
         {
             this.mCount = mCount;
@@ -31,54 +57,28 @@ namespace CreatorLibrary
             this.firstPort = firstPort;
             currentPort = firstPort;
 
-            masters = new List<MasterConnector>();
-            slaves = new List<SlaveConnector>();
+            masters = new List<MasterNode>();
+            slaves = new List<SlaveNode>();
             threads = new List<Thread>();
         }
+        /// <summary>
+        /// Deploys master and slaves nodes and run its;
+        /// </summary>
         public void DeployUserStorageApp()
         {
-            for (int i = 0; i < mCount; i++)
-            {
-                masters.Add((MasterConnector)CreateNode(typeof(ServiceConnectorLibrary.MasterConnector)));
-                currentPort++;
-            }
-            for (int i = 0; i < sCount; i++)
-            {
-                slaves.Add((SlaveConnector)CreateNode(typeof(ServiceConnectorLibrary.SlaveConnector)));
-                currentPort++;
-            }
-            //ConnectNodes();
+            DeployMasters();
+            DeploySlaves();
 
-
-            foreach (var master in masters)
-            {
-                threads.Add(new Thread(delegate ()
-                {
-                    master.ListenConnections(new object());
-                }));
-            }
-
-            foreach (var slave in slaves)
-            {
-                threads.Add(new Thread(delegate ()
-                {
-                    slave.ListenConnection(new object());
-                }));
-            }
 
             foreach (var thread in threads)
             {
                 thread.Start();
             }
-            //SaveNodesState();
-            //slaves[0].Find(new object());
-            //masters[0].SetState(new object());
-            //foreach (var item in slaves)
-            //{
-            //    ThreadPool.QueueUserWorkItem(item.ListenConnection);
-            //}  
         }
 
+        /// <summary>
+        /// Stops master slave application and saves state of services
+        /// </summary>
         public void CloseApp()
         {
             foreach (var master in masters)
@@ -89,7 +89,47 @@ namespace CreatorLibrary
             foreach (var slave in slaves)
             {
                 slave.Close();
-            }           
+            }
+        }
+
+        /// <summary>
+        /// Deploys master nodes
+        /// </summary>
+        private void DeployMasters()
+        {
+            for (int i = 0; i < mCount; i++)
+            {
+                masters.Add((MasterNode)CreateNode(typeof(ServiceConnectorLibrary.MasterNode)));
+                currentPort++;
+            }
+
+            foreach (var master in masters)
+            {
+                threads.Add(new Thread(delegate ()
+                {
+                    master.ListenConnections(new object());
+                }));
+            }
+        }
+
+        /// <summary>
+        /// Deploys slaves nodes
+        /// </summary>
+        private void DeploySlaves()
+        {
+            for (int i = 0; i < sCount; i++)
+            {
+                slaves.Add((SlaveNode)CreateNode(typeof(ServiceConnectorLibrary.SlaveNode)));
+                currentPort++;
+            }
+
+            foreach (var slave in slaves)
+            {
+                threads.Add(new Thread(delegate ()
+                {
+                    slave.ListenConnection(new object());
+                }));
+            }
         }
         //private void SaveNodesState()
         //{
@@ -114,7 +154,12 @@ namespace CreatorLibrary
         //        }
         //    }
         //}
-        private void ConnectNodes()
+
+        
+        /// <summary>
+        /// If slaves and masters are created in one instance of deployer, they can be connected by this method;
+        /// </summary>
+        public void ConnectNodes()
         {
             int[] slavePorts = slaves?.Select(s => s.endPoint.Port).ToArray();
             int[] masterPorts = masters?.Select(m => m.endPoint.Port).ToArray();
@@ -130,6 +175,11 @@ namespace CreatorLibrary
             }
         }
 
+        /// <summary>
+        /// Create node of master or slave type
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
         private object CreateNode(Type type)
         {
             AppDomain slaveDomain = CreateDomain(currentPort + "Domain");
@@ -146,6 +196,11 @@ namespace CreatorLibrary
                                                                         null);
         }
 
+        /// <summary>
+        /// Create separate domen for each node
+        /// </summary>
+        /// <param name="domainName"></param>
+        /// <returns></returns>
         private AppDomain CreateDomain(string domainName)
         {
             var domainSetup = new AppDomainSetup

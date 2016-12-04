@@ -41,25 +41,34 @@ namespace UserStorageServiceLibrary
         public bool Remove(User user)
         {
             if (ReferenceEquals(user, null)) throw new ArgumentNullException();
-
-            return storage.Delete(user);
+            bool result = storage.Delete(user);
+            if(result) OnStateChanged("Remove", user);
+            return result;
         }
 
         public bool Remove(int userId)
         {
-            return storage.Delete(userId);
+            bool result = storage.Delete(userId);
+            if (result) OnStateChanged("Remove", new User() { personalId = userId });
+            return result;
         }
 
         public User FindById(int userId)
         {
-            return storage.FindById(userId);
+            User result = storage.FindById(userId);
+            if (ReferenceEquals(result, null)) OnUserNotFound(null, userId);
+            result = storage.FindById(userId);
+            return result;
         }
 
         public IEnumerable<User> FindByPredicate(Func<User,bool> predicate)
         {
             if (ReferenceEquals(predicate, null)) throw new ArgumentNullException();
 
-            return storage.FindByPredicate(predicate);
+            IEnumerable<User> result = storage.FindByPredicate(predicate);
+            if (ReferenceEquals(result, null)) OnUserNotFound(predicate, -1);
+            result = storage.FindByPredicate(predicate);
+            return result;
         }
 
         private void OnStateChanged(string operation, User user)

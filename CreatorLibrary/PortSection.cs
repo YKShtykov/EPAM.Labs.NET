@@ -8,6 +8,9 @@ using System.Configuration;
 
 namespace CreatorLibrary
 {
+    /// <summary>
+    /// Class for custom config section creating
+    /// </summary>
     public class PortConfigSection : ConfigurationSection
     {
         [ConfigurationProperty("nodes")]

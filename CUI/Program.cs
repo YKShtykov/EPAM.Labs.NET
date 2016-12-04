@@ -19,6 +19,7 @@ namespace CUI
             var msDeployer = new UserStorageAppDeployer(mCount,sCount, 10000);
 
             msDeployer.DeployUserStorageApp();
+            msDeployer.ConnectNodes();
             msDeployer.CloseApp();
             //Console.ReadKey();
         }

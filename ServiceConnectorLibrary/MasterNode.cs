@@ -10,26 +10,47 @@ using System.Xml.Serialization;
 
 namespace ServiceConnectorLibrary
 {
-    public class MasterConnector : MarshalByRefObject
+    /// <summary>
+    /// Class for master nodes
+    /// </summary>
+    public class MasterNode : MarshalByRefObject
     {
-        private Socket socket;
-        public IPEndPoint endPoint;
+        /// <summary>
+        /// Nodes' listening socket;
+        /// </summary>
+        public Socket socket { get; private set; }
+        /// <summary>
+        /// Nodes' endPoint
+        /// </summary>
+        public IPEndPoint endPoint { get; private set; }        
+        /// <summary>
+        /// Nodes' UserStorageService for working with users
+        /// </summary>
+        public UserStorageService service { get; private set; }
+
         private int[] slavePorts;
-        public readonly UserStorageService service;
         private bool сlosing = false;
-        private bool сanBeClosed = false;
-        public MasterConnector(int port)
+
+        public MasterNode(int port)
         {
             service = new UserStorageService();
             service.StateChanged += SendNewState;
             socket = CreateAndBindSocket(port);
         }
 
+        /// <summary>
+        /// Method for connecting master to slaves
+        /// </summary>
+        /// <param name="ports"></param>
         public void SetSlavePorts(int[] ports)
         {
             slavePorts = ports.Where(p=>p!=endPoint.Port).ToArray();
         }
 
+        /// <summary>
+        /// Method for listening
+        /// </summary>
+        /// <param name="state"></param>
         public void ListenConnections(object state)
         {
             while (!сlosing)
@@ -56,14 +77,13 @@ namespace ServiceConnectorLibrary
                     handler.Close();
                 }
             }
-            сanBeClosed = true;
         }
 
-        public void SetState(object state)
-        {
-                SendNewState(new object(), new UserEventArgs("Add", new User() { personalId = 7 }));
-        }
-
+        /// <summary>
+        /// When User Storage Service state changes this method runs
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="eventArgs"></param>
         private void SendNewState(object sender, UserEventArgs eventArgs)
         {
             var message = new UpdateMessage()
@@ -80,6 +100,11 @@ namespace ServiceConnectorLibrary
             }
         }
 
+        /// <summary>
+        /// Send byte message to some port
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <param name="port"></param>
         private void SendMessage(byte[] msg, int port)
         {
             if (ReferenceEquals(msg, null)) throw new Exception();
@@ -88,25 +113,25 @@ namespace ServiceConnectorLibrary
             IPAddress ipAddr = ipHost.AddressList[0];
             IPEndPoint ipEndPoint = new IPEndPoint(ipAddr, port);
             Socket sct = new Socket(ipAddr.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            bool connected = false;
-            while (!connected)
+            try
             {
-                try
-                {
-                    sct.Connect(ipEndPoint);
-                    connected = false;
-                }
-                catch (Exception)
-                {
-                    continue;
-                    //throw new Exception("connection failed");
-                }
+                sct.Connect(ipEndPoint);
             }
-            
+            catch (Exception)
+            {
+                Console.WriteLine("connection from " +endPoint.Port + " to "+ port + " failed");
+            }
+
             sct.Send(msg);
             Console.WriteLine(">> " + port);
         }
 
+
+        /// <summary>
+        /// Creates new socket and bind it to portNumber
+        /// </summary>
+        /// <param name="portNumber"></param>
+        /// <returns></returns>
         private Socket CreateAndBindSocket(int portNumber)
         {
             IPHostEntry ipHost = Dns.GetHostEntry("localhost");
@@ -122,6 +147,10 @@ namespace ServiceConnectorLibrary
             return sct;
         }
 
+        /// <summary>
+        /// Income messages handler
+        /// </summary>
+        /// <param name="bytes"></param>
         private void HandleMessage(byte[] bytes)
         {
             var cast = MessageConverter.BytesToObject(bytes) is FindMessage;
@@ -169,6 +198,9 @@ namespace ServiceConnectorLibrary
             
         }        
 
+        /// <summary>
+        /// Closes node
+        /// </summary>
         public void Close()
         {
             сlosing = true;

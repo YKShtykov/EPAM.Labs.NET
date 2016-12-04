@@ -8,8 +8,16 @@ using System.Threading.Tasks;
 
 namespace ServiceConnectorLibrary
 {
+    /// <summary>
+    /// Class for converting messages to bytes arrays
+    /// </summary>
     class MessageConverter
     {
+        /// <summary>
+        /// Converts message to bytes array
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
         public static byte[] ObjectToBytes(IMessage message)
         {
             if (message == null)
@@ -22,6 +30,11 @@ namespace ServiceConnectorLibrary
             }
         }
 
+        /// <summary>
+        /// Converts bytes array to message
+        /// </summary>
+        /// <param name="arr"></param>
+        /// <returns></returns>
         public static IMessage BytesToObject(byte[] arr)
         {
             if (arr == null)

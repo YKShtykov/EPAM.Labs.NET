@@ -43,10 +43,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Messages.cs" />
-    <Compile Include="MasterConnector.cs" />
+    <Compile Include="MasterNode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MessageConverter.cs" />
-    <Compile Include="SlaveConnector.cs" />
+    <Compile Include="SlaveNode.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\UserStorageServiceLibrary\UserStorageServiceLibrary.csproj">
