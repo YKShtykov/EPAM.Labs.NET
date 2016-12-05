@@ -107,13 +107,14 @@ namespace ServiceConnectorLibrary
             try
             {
                 sct.Connect(ipEndPoint);
+                sct.Send(msg);
+                Console.WriteLine(">>" + masterPort);
             }
             catch (Exception)
             {
-                throw new Exception("connection failed");
+                //throw new Exception("connection failed");
             }
-            sct.Send(msg);
-            Console.WriteLine(">>" + masterPort);
+            
         }
 
         /// <summary>

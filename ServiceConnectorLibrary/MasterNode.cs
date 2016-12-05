@@ -116,14 +116,14 @@ namespace ServiceConnectorLibrary
             try
             {
                 sct.Connect(ipEndPoint);
+                sct.Send(msg);
+                Console.WriteLine(">> " + port);
             }
             catch (Exception)
             {
                 Console.WriteLine("connection from " +endPoint.Port + " to "+ port + " failed");
             }
 
-            sct.Send(msg);
-            Console.WriteLine(">> " + port);
         }
 
 

@@ -13,8 +13,8 @@ namespace WcfServiceLibrary1
     // NOTE: You can use the "Rename" command on the "Refactor" menu to change the class name "Service1" in both code and config file together.
     public class MasterService : IWcfService
     {
-        UserStorageAppDeployer msDeployer;
-        public MasterService()
+        public static UserStorageAppDeployer msDeployer;
+        static MasterService()
         {
             Configuration cfg = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
             var sections = cfg.Sections;
@@ -74,7 +74,7 @@ namespace WcfServiceLibrary1
             return ContextConverter.UserToContext(user);
         }
 
-        private void ConnectToSlaves(int sCount,int mCount ,int firstSlavePort, int firstMasterPort)
+        private static void ConnectToSlaves(int sCount,int mCount ,int firstSlavePort, int firstMasterPort)
         {
             int[] slavesPorts = new int[sCount];
             int[] masterPorts = new int[mCount];

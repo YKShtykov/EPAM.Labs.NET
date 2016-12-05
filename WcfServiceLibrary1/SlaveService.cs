@@ -12,8 +12,9 @@ namespace WcfServiceLibrary1
 {
     class SlaveService: IWcfService
     {
-        UserStorageAppDeployer msDeployer;
-        public SlaveService()
+        public static UserStorageAppDeployer msDeployer;
+
+        static SlaveService()
         {
             Configuration cfg = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
             var sections = cfg.Sections;
@@ -71,7 +72,7 @@ namespace WcfServiceLibrary1
             return ContextConverter.UserToContext(user);
         }
 
-        private void ConnectToMaster(int firstMasterPort)
+        private static void ConnectToMaster(int firstMasterPort)
         {
             foreach (var slave in msDeployer.slaves)
             {

@@ -11,6 +11,7 @@ namespace WcfServiceLibrary1
     {
         public static UserContext UserToContext(User user)
         {
+            if (ReferenceEquals(user, null)) return null;
             return new UserContext()
             {
                 FirstName = user.FirstName,
@@ -22,6 +23,7 @@ namespace WcfServiceLibrary1
         }
         public static User ContextToUser(UserContext user)
         {
+            if (ReferenceEquals(user, null)) return null;
             return new User()
             {
                 FirstName = user.FirstName,
