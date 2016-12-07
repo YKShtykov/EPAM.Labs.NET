@@ -3,6 +3,9 @@ using System.Runtime.Serialization;
 
 namespace UserStorageServiceLibrary
 {
+    /// <summary>
+    /// Exception throws when user is not valid
+    /// </summary>
     [Serializable]
     internal class UserNotValidException : Exception
     {

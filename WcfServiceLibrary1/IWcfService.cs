@@ -8,7 +8,9 @@ using System.Text;
 
 namespace WcfServiceLibrary1
 {
-    // NOTE: You can use the "Rename" command on the "Refactor" menu to change the interface name "IService1" in both code and config file together.
+    /// <summary>
+    /// wcf service interface
+    /// </summary>
     [ServiceContract]
     public interface IWcfService
     {
@@ -27,6 +29,9 @@ namespace WcfServiceLibrary1
         bool Remove(UserContext user);
     }
 
+    /// <summary>
+    /// User discribing context
+    /// </summary>
     [DataContract]
     public class UserContext
     {
